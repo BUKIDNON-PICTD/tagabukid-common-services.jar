@@ -1,0 +1,66 @@
+import com.rameses.annotations.*
+import com.rameses.common.*
+import com.rameses.eserver.*;
+import java.rmi.server.UID;
+
+public class TagabukidLookupService
+{
+
+	@Service('TagabukidLookupUtilService')
+	def util 
+
+	// @ProxyMethod
+	// public def lookupDIN( params ) {
+	// 	return util.lookupDIN( 'dts:getDocumentbyDIN', params,'objid' )
+	// }
+
+	@ActiveDB(value='tagabukidcommon', em='tagabukid_hrmis')
+	def em;
+
+	@ProxyMethod
+	public def lookupOrgUnitByParents( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getOrgUnitByParents', params,'orgunitid' ) //to sort office ID
+	}
+
+	@ProxyMethod
+	public def lookupOrgUnitByParent( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getOrgUnitByParent', params,'orgunitid' )
+	}
+
+	@ProxyMethod
+	public def lookupOrgUnit( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getOrgUnit', params,'orgunitid' ) //lookup for all offices
+	}
+
+
+	@ProxyMethod
+	public def lookupUserOrg( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getUserOrg', params,'org_objid' )		//lookup for sorted office
+	}
+
+	@ProxyMethod
+	public def lookupEntityPersonnel( params ) {
+		params.filter = '''
+			INNER JOIN entityindividual ei ON e.objid=ei.objid 
+			INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
+			WHERE e.entityname LIKE $P{searchtext}  
+			ORDER BY e.entityname 
+			'''			
+		return util.lookupmain( 'tagabukidcommon:getEntityPersonnel', params,'objid' )	
+	}
+
+	@ProxyMethod
+	public def lookupEmployeeJobPositionMaster( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:lookupEmployeeJobPositionMaster', params,'objid' )
+	}
+
+	@ProxyMethod
+	public def lookupNatureofAppointment( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getNatureofAppointment', params,'objid' )
+	}
+	
+	@ProxyMethod
+	public def lookupTranche( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getTranche', params,'objid' )
+	}
+}
