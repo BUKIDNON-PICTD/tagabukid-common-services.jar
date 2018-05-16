@@ -45,14 +45,20 @@ class TagabukidLookupUtilService
 		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'
 
 		def qry = emmain.sqlContext.createNamedQuery(namedsql)
-		
-		if (pagingKeys){
-			qry.setPagingKeys(pagingKeys)
-		}
-		if (params._start != null){
-			qry.setFirstResult( params._start )
-			qry.setMaxResults(params._limit)
-		}
+		// for (int i = 0; i< filters.size(); i++) {
+  //           params.filters = filters[i]
+  //           qry.setVars(params)
+  			if(params.filter){
+  				qry.setVars(params)
+  			}
+	        if (pagingKeys){
+				qry.setPagingKeys(pagingKeys)
+			}
+			if (params._start != null){
+				qry.setFirstResult( params._start )
+				qry.setMaxResults(params._limit)
+			}
+		// }
 		
 		return qry.setParameters(params).resultList 
 	}
