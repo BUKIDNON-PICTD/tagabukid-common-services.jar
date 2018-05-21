@@ -67,8 +67,23 @@ public class TagabukidLookupService
 	}
 
 	@ProxyMethod
-	public def lookupPlantilla( params ) {
-		params.orgunitid = params.org.orgunitid.toString()
-		return utilpostgre.lookupPostgreHrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
+	public def lookupFund( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getFund', params,'objid' )
 	}
+
+	@ProxyMethod
+	public def lookupFund( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getFund', params,'objid' )
+	}
+
+	@ProxyMethod
+	public def lookupAccountTitle( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getAccountTitle', params,'objid' )
+	}
+
+	@ProxyMethod
+	public def lookupJobPosition( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getJobPosition', params,'objid' )
+	}
+
 }

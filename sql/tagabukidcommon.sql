@@ -74,5 +74,44 @@ AND p."Discriminator" = 'CasualPlantilla'
 AND mm."Id" IS NULL
 
 
+[getFund]
+SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
+FROM references_tblfinfund AS node,
+        references_tblfinfund AS parent
+WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.name LIKE $P{searchtext}
+GROUP BY node.name
+ORDER BY node.lft
+
+[getAccountTitle]
+SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
+FROM references_tblfinaccounttitle AS node,
+        references_tblfinaccounttitle AS parent
+WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.name LIKE $P{searchtext}
+GROUP BY node.name
+ORDER BY node.lft
+
+[getJobPosition]
+SELECT * FROM references_tbljobposition
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 
+[findroot]
+SELECT * FROM ${tablename} WHERE parentid IS NULL
+
+[initroot]
+UPDATE ${tablename} SET lft = 1, rgt = 2
+
+[getnodes]
+SELECT * FROM ${tablename} WHERE parentid IS NOT NULL
+
+[findparent]
+SELECT * FROM ${tablename} WHERE objid = $P{parentid}
+
+[changeParentRight]
+UPDATE ${tablename} SET rgt = rgt + 2 WHERE rgt > $P{myLeft}
+
+[changeParentLeft]
+UPDATE ${tablename} SET lft = lft + 2 WHERE lft > $P{myLeft}
+
+[addChild]
+UPDATE ${tablename} o SET o.lft = $P{myLeft} + 1, o.rgt = $P{myLeft} + 2 WHERE o.objid = $P{objid}

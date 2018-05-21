@@ -17,6 +17,8 @@ class TagabukidLookupUtilService
 	@Service('QueryService') 
 	def querySvc; 
 	
+	@ActiveDB(value='tagabukidcommon', em='tagabukid_hrmis')
+	def emcommon;
 
 	@ProxyMethod
 	public def lookuphrmis( namedsql, params, pagingKeys) {
@@ -58,6 +60,29 @@ class TagabukidLookupUtilService
 		// }
 		
 		return qry.setParameters(params).resultList 
+	}
+
+
+	@ProxyMethod
+	public def hirarchyutil(o) {
+		//def root = emcommon.findroot([tablename:o.tablename]);
+		//emcommon.initroot([tablename:o.tablename]);
+
+		def nodes = emcommon.getnodes([tablename:o.tablename])
+
+		nodes.each{
+			def parent = emcommon.findparent([tablename:o.tablename,parentid:it.parentid]);
+
+			//emcommon.locktable([tablename:o.tablename])
+			emcommon.changeParentRight([tablename:o.tablename,myLeft:parent.lft]);
+			emcommon.changeParentLeft([tablename:o.tablename,myLeft:parent.lft]);
+
+			emcommon.addChild([tablename:o.tablename,myLeft:parent.lft,objid:it.objid])
+			//emcommon.unlocktable()
+		}
+
+
+		return "DONE"
 	}
 
 
