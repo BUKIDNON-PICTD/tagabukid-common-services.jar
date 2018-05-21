@@ -9,6 +9,8 @@ public class TagabukidLookupService
 	@Service('TagabukidLookupUtilService')
 	def util 
 
+	@Service('TagabukidLookupPostgreUtilService')
+	def utilpostgre 
 	// @ProxyMethod
 	// public def lookupDIN( params ) {
 	// 	return util.lookupDIN( 'dts:getDocumentbyDIN', params,'objid' )
@@ -62,5 +64,11 @@ public class TagabukidLookupService
 	@ProxyMethod
 	public def lookupTranche( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:getTranche', params,'objid' )
+	}
+
+	@ProxyMethod
+	public def lookupPlantilla( params ) {
+		params.orgunitid = params.org.orgunitid.toString()
+		return utilpostgre.lookupPostgreHrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
 	}
 }

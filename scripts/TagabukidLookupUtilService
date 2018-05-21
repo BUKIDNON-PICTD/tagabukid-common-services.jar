@@ -11,8 +11,6 @@ class TagabukidLookupUtilService
 	@PersistenceContext('main')
 	def emmain
 
-	
-
 	@Env
 	def env;
 
@@ -61,7 +59,6 @@ class TagabukidLookupUtilService
 		
 		return qry.setParameters(params).resultList 
 	}
-
 
 
 }

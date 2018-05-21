@@ -1,0 +1,29 @@
+import com.rameses.annotations.*;
+import com.rameses.eserver.*;
+import com.rameses.common.*;
+
+class TagabukidLookupPostgreUtilService
+{
+	@PersistenceContext('postgrehrmis')
+	def emposthrmis
+
+	@ProxyMethod
+	public def lookupPostgreHrmis( namedsql, params, pagingKeys) {
+		if (! params) params = [:]
+		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'
+		
+		def qry = emposthrmis.sqlContext.createNamedQuery(namedsql)
+		
+		// if (pagingKeys){
+		// 	qry.setPagingKeys(pagingKeys)
+		// }
+		// if (params._start != null){
+		// 	qry.setFirstResult( params._start )
+		// 	qry.setMaxResults(params._limit)
+		// }
+		
+		return qry.setParameters(params).resultList 
+	}
+
+
+}

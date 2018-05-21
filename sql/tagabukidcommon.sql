@@ -47,3 +47,32 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 [getTranche]
 SELECT * FROM hrmis_tblpayrollsalarytranche
 WHERE isapproved = 1 AND entity_name LIKE $P{searchtext}
+
+[getVacantPlantilla]
+SELECT p."Id",p."ItemNo",
+  o."OrgUnitId" AS org_objid,o."Entity_Name" AS org_name,o."Entity_AcronymAbbreviation" AS org_code,o."Entity_Description" AS org_description,
+  j."Id" AS jobposition_objid,j."Entity_Name" AS jobposition_name,j."Entity_AcronymAbbreviation" AS jobposition_code,j."Entity_Description" AS jobposition_description,
+  f."Id" AS finfund_objid,f."Entity_Name" AS finfund_name,f."Entity_AcronymAbbreviation" AS finfund_code,f."Entity_Description" AS finfund_description,
+  a."Id" AS finaccounttitle_objid,a."Entity_Name" AS finaccounttitle_name,a."Entity_AcronymAbbreviation" AS finaccounttitle_code,a."Entity_Description" AS finaccounttitle_description,
+  i."Id" AS incrementtype_objid,i."Entity_Name" AS incrementtype_name,i."Entity_AcronymAbbreviation" AS incrementtype_code,i."Entity_Description" AS incrementtype_description,
+  c."Id" AS positionclassification_objid,c."Entity_Name" AS positionclassification_name,c."Entity_AcronymAbbreviation" AS positionclassification_code,c."Entity_Description" AS positionclassification_description,
+  s."Id" AS postiionsubclassification_objid,s."Entity_Name" AS postiionsubclassification_name,s."Entity_AcronymAbbreviation" AS postiionsubclassification_code,s."Entity_Description" AS postiionsubclassification_description,
+  p."Discriminator"
+FROM "hrmis"."tblEmploymentPlantilla" p
+INNER JOIN "references"."tblOrganizationUnit" o ON o."OrgUnitId" = p."OrganizationUnitId"
+INNER JOIN "references"."tblJobPosition" j ON j."Id" = p."JobPositionId"
+INNER JOIN "references"."tblFinFund" f ON f."Id" = p."FundId"
+INNER JOIN "references"."tblFinAccountTitle" a ON a."Id" = p."AccountTitleId"
+LEFT JOIN "references"."tblEmptIncrementType" i ON i."Id" = p."IncrementTypeId"
+LEFT JOIN "references"."tblEmptPositionServiceClassification" c ON c."Id" = p."PositionServiceClassificationId"
+LEFT JOIN "references"."tblEmptPositionServiceSubClassification" s ON s."Id" = p."PositionServiceSubClassificationId"
+LEFT JOIN "hrmis"."tblEmploymentPlantillaAppointmentGroupMember" mm ON mm."PlantillaId" = p."Id"
+LEFT JOIN "hrmis"."tblEmploymentBatchPlantillaAppointment" bb ON bb."PlantillaGroupId" = mm."PlantillaAppointmentGroupId"
+WHERE p."IsFunded" = true
+AND o."OrgUnitId" = UUID($P{orgunitid})
+AND p."Discriminator" = 'CasualPlantilla'
+AND mm."Id" IS NULL
+
+
+
+
