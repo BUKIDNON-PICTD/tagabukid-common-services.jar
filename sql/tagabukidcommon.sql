@@ -46,7 +46,7 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 [getTranche]
 SELECT * FROM hrmis_tblpayrollsalarytranche
-WHERE isapproved = 1 AND entity_name LIKE $P{searchtext}
+WHERE isapproved = 1 AND name LIKE $P{searchtext}
 
 [getVacantPlantilla]
 SELECT p."Id",p."ItemNo",

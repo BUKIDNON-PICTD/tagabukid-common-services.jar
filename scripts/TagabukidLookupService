@@ -52,8 +52,9 @@ public class TagabukidLookupService
 	}
 
 	@ProxyMethod
-	public def lookupEmployeeJobPositionMaster( params ) {
-		return util.lookuphrmis( 'tagabukidcommon:lookupEmployeeJobPositionMaster', params,'objid' )
+	public def lookupPlantilla( params ) {
+		params.orgunitid = params.org.orgunitid
+		return utilpostgre.lookupPostgreHrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
 	}
 
 	@ProxyMethod
