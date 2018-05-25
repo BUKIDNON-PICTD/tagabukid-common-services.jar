@@ -52,6 +52,17 @@ public class TagabukidLookupService
 	}
 
 	@ProxyMethod
+	public def getEntityByObjid( params ) {
+		println params
+		params.filter = '''
+			INNER JOIN entityindividual ei ON e.objid=ei.objid 
+			INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
+			WHERE e.objid = $P{entityid}  
+			'''			
+		return util.lookupmainsingle( 'tagabukidcommon:getEntityPersonnel', params,'objid' )	
+	}
+
+	@ProxyMethod
 	public def lookupEmployeeJobPositionMaster( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:lookupEmployeeJobPositionMaster', params,'objid' )
 	}
@@ -71,10 +82,6 @@ public class TagabukidLookupService
 		return util.lookuphrmis( 'tagabukidcommon:getFund', params,'objid' )
 	}
 
-	@ProxyMethod
-	public def lookupFund( params ) {
-		return util.lookuphrmis( 'tagabukidcommon:getFund', params,'objid' )
-	}
 
 	@ProxyMethod
 	public def lookupAccountTitle( params ) {
