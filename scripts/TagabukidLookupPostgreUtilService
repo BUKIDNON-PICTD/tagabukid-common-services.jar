@@ -25,5 +25,23 @@ class TagabukidLookupPostgreUtilService
 		return qry.setParameters(params).resultList 
 	}
 
+	@ProxyMethod
+	public def lookupPostgreHrmisSingle( namedsql, params, pagingKeys) {
+		if (! params) params = [:]
+		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'
+		
+		def qry = emposthrmis.sqlContext.createNamedQuery(namedsql)
+		
+		// if (pagingKeys){
+		// 	qry.setPagingKeys(pagingKeys)
+		// }
+		// if (params._start != null){
+		// 	qry.setFirstResult( params._start )
+		// 	qry.setMaxResults(params._limit)
+		// }
+		
+		return qry.setParameters(params).singleResult 
+	}
+
 
 }

@@ -88,25 +88,56 @@ class TagabukidLookupUtilService
 
 
 	@ProxyMethod
-	public def hirarchyutil(o) {
+	public def hierarchyutil(o) {
 		//def root = emcommon.findroot([tablename:o.tablename]);
-		//emcommon.initroot([tablename:o.tablename]);
+		emcommon.setlftrgttonull([tablename:o.tablename]);
+		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
+		def nodes;
+		while(nodes = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])){
+			
+			nodes.each{
+				def parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid]]);
+				if(parent){
+					//emcommon.locktable([tablename:o.tablename])
+					emcommon.changeParentRight([tablename:o.tablename,myLeft:parent.lft]);
+					emcommon.changeParentLeft([tablename:o.tablename,myLeft:parent.lft]);
 
-		def nodes = emcommon.getnodes([tablename:o.tablename])
-
-		nodes.each{
-			def parent = emcommon.findparent([tablename:o.tablename,parentid:it.parentid]);
-
-			//emcommon.locktable([tablename:o.tablename])
-			emcommon.changeParentRight([tablename:o.tablename,myLeft:parent.lft]);
-			emcommon.changeParentLeft([tablename:o.tablename,myLeft:parent.lft]);
-
-			emcommon.addChild([tablename:o.tablename,myLeft:parent.lft,objid:it.objid])
-			//emcommon.unlocktable()
+					emcommon.addChild([tablename:o.tablename,myLeft:parent.lft,tblprimarykey:o.primarykey,objid:it[o.primarykey]])
+					//emcommon.unlocktable()
+				}
+			}
+			
 		}
 
 
 		return "DONE"
+	}
+	
+	@ProxyMethod
+	public void AddNode(o,item) {
+		def parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:item[o.parentid]]);
+		if(parent){
+			//emcommon.locktable([tablename:o.tablename])
+			emcommon.changeParentRight([tablename:o.tablename,myLeft:parent.lft]);
+			emcommon.changeParentLeft([tablename:o.tablename,myLeft:parent.lft]);
+
+			emcommon.addChild([tablename:o.tablename,myLeft:parent.lft,tblprimarykey:o.primarykey,objid:item[o.primarykey]])
+			println item.name
+			//emcommon.unlocktable()
+		}
+		
+	}
+
+	@ProxyMethod
+	public def getNodesToInsert(o) {
+		return emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])
+	}
+
+	@ProxyMethod
+	public void cleartable(o) {
+		//def root = emcommon.findroot([tablename:o.tablename]);
+		emcommon.setlftrgttonull([tablename:o.tablename]);
+		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
 	}
 
 

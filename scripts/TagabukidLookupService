@@ -70,6 +70,11 @@ public class TagabukidLookupService
 	}
 
 	@ProxyMethod
+	public def getPlantillaById( params ) {
+		return utilpostgre.lookupPostgreHrmisSingle( 'tagabukidcommon:getPlantillaById', params,'objid' )
+	}
+
+	@ProxyMethod
 	public def lookupNatureofAppointment( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:getNatureofAppointment', params,'objid' )
 	}

@@ -20,7 +20,7 @@ ORDER BY name
 
 [getEntityPersonnel]
 SELECT 
-  e.*, ei.gender, ei.birthdate, 
+  e.*,ei.lastname,ei.firstname,ei.middlename, ei.gender, ei.birthdate, 
   (SELECT bldgno FROM entity_address WHERE objid=e.address_objid) as address_bldgno, 
   (SELECT bldgname FROM entity_address WHERE objid=e.address_objid) as address_bldgname,  
   (SELECT unitno FROM entity_address WHERE objid=e.address_objid) as address_unitno , 
@@ -57,10 +57,11 @@ SELECT p."Id",p."ItemNo",
   i."Id" AS incrementtype_objid,i."Entity_Name" AS incrementtype_name,i."Entity_AcronymAbbreviation" AS incrementtype_code,i."Entity_Description" AS incrementtype_description,
   c."Id" AS positionclassification_objid,c."Entity_Name" AS positionclassification_name,c."Entity_AcronymAbbreviation" AS positionclassification_code,c."Entity_Description" AS positionclassification_description,
   s."Id" AS postiionsubclassification_objid,s."Entity_Name" AS postiionsubclassification_name,s."Entity_AcronymAbbreviation" AS postiionsubclassification_code,s."Entity_Description" AS postiionsubclassification_description,
-  p."Discriminator"
+  p."Discriminator", pay."Id" AS paygradeandstepincrement_objid, pay."Grade" AS paygradeandstepincrement_grade, pay."Step" AS paygradeandstepincrement_step
 FROM "hrmis"."tblEmploymentPlantilla" p
 INNER JOIN "references"."tblOrganizationUnit" o ON o."OrgUnitId" = p."OrganizationUnitId"
 INNER JOIN "references"."tblJobPosition" j ON j."Id" = p."JobPositionId"
+INNER JOIN "references"."tblPayGradeAndStepIncrement" pay ON pay."Id" = j."PayGradeId"
 INNER JOIN "references"."tblFinFund" f ON f."Id" = p."FundId"
 INNER JOIN "references"."tblFinAccountTitle" a ON a."Id" = p."AccountTitleId"
 LEFT JOIN "references"."tblEmptIncrementType" i ON i."Id" = p."IncrementTypeId"
@@ -72,6 +73,31 @@ WHERE p."IsFunded" = true
 AND o."OrgUnitId" = UUID($P{orgunitid})
 AND p."Discriminator" = 'CasualPlantilla'
 AND mm."Id" IS NULL
+
+[getPlantillaById]
+SELECT p."Id",p."ItemNo",
+  o."OrgUnitId" AS org_objid,o."Entity_Name" AS org_name,o."Entity_AcronymAbbreviation" AS org_code,o."Entity_Description" AS org_description,
+  j."Id" AS jobposition_objid,j."Entity_Name" AS jobposition_name,j."Entity_AcronymAbbreviation" AS jobposition_code,j."Entity_Description" AS jobposition_description,
+  f."Id" AS finfund_objid,f."Entity_Name" AS finfund_name,f."Entity_AcronymAbbreviation" AS finfund_code,f."Entity_Description" AS finfund_description,
+  a."Id" AS finaccounttitle_objid,a."Entity_Name" AS finaccounttitle_name,a."Entity_AcronymAbbreviation" AS finaccounttitle_code,a."Entity_Description" AS finaccounttitle_description,
+  i."Id" AS incrementtype_objid,i."Entity_Name" AS incrementtype_name,i."Entity_AcronymAbbreviation" AS incrementtype_code,i."Entity_Description" AS incrementtype_description,
+  c."Id" AS positionclassification_objid,c."Entity_Name" AS positionclassification_name,c."Entity_AcronymAbbreviation" AS positionclassification_code,c."Entity_Description" AS positionclassification_description,
+  s."Id" AS postiionsubclassification_objid,s."Entity_Name" AS postiionsubclassification_name,s."Entity_AcronymAbbreviation" AS postiionsubclassification_code,s."Entity_Description" AS postiionsubclassification_description,
+  p."Discriminator", pay."Id" AS paygradeandstepincrement_objid, pay."Grade" AS paygradeandstepincrement_grade, pay."Step" AS paygradeandstepincrement_step
+FROM "hrmis"."tblEmploymentPlantilla" p
+INNER JOIN "references"."tblOrganizationUnit" o ON o."OrgUnitId" = p."OrganizationUnitId"
+INNER JOIN "references"."tblJobPosition" j ON j."Id" = p."JobPositionId"
+INNER JOIN "references"."tblPayGradeAndStepIncrement" pay ON pay."Id" = j."PayGradeId"
+INNER JOIN "references"."tblFinFund" f ON f."Id" = p."FundId"
+INNER JOIN "references"."tblFinAccountTitle" a ON a."Id" = p."AccountTitleId"
+LEFT JOIN "references"."tblEmptIncrementType" i ON i."Id" = p."IncrementTypeId"
+LEFT JOIN "references"."tblEmptPositionServiceClassification" c ON c."Id" = p."PositionServiceClassificationId"
+LEFT JOIN "references"."tblEmptPositionServiceSubClassification" s ON s."Id" = p."PositionServiceSubClassificationId"
+LEFT JOIN "hrmis"."tblEmploymentPlantillaAppointmentGroupMember" mm ON mm."PlantillaId" = p."Id"
+LEFT JOIN "hrmis"."tblEmploymentBatchPlantillaAppointment" bb ON bb."PlantillaGroupId" = mm."PlantillaAppointmentGroupId"
+WHERE p."IsFunded" = true
+AND p."Id" = UUID($P{plantillaid})
+AND p."Discriminator" = 'CasualPlantilla'
 
 
 [getFund]
@@ -95,17 +121,18 @@ SELECT * FROM references_tbljobposition
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 
-[findroot]
-SELECT * FROM ${tablename} WHERE parentid IS NULL
-
 [initroot]
-UPDATE ${tablename} SET lft = 1, rgt = 2
+UPDATE ${tablename} SET lft = 1, rgt = 2 WHERE ${parentid} IS NULL
+
+[setlftrgttonull]
+UPDATE ${tablename} SET lft = NULL, rgt = NULL
+
 
 [getnodes]
-SELECT * FROM ${tablename} WHERE parentid IS NOT NULL
+SELECT * FROM ${tablename} WHERE lft IS NULL
 
 [findparent]
-SELECT * FROM ${tablename} WHERE objid = $P{parentid}
+SELECT * FROM ${tablename} WHERE ${tblprimarykey} = $P{parentid} AND lft IS NOT NULL
 
 [changeParentRight]
 UPDATE ${tablename} SET rgt = rgt + 2 WHERE rgt > $P{myLeft}
@@ -114,4 +141,4 @@ UPDATE ${tablename} SET rgt = rgt + 2 WHERE rgt > $P{myLeft}
 UPDATE ${tablename} SET lft = lft + 2 WHERE lft > $P{myLeft}
 
 [addChild]
-UPDATE ${tablename} o SET o.lft = $P{myLeft} + 1, o.rgt = $P{myLeft} + 2 WHERE o.objid = $P{objid}
+UPDATE ${tablename} SET lft = $P{myLeft} + 1, rgt = $P{myLeft} + 2 WHERE ${tblprimarykey} = $P{objid}
