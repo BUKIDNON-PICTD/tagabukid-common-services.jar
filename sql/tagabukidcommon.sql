@@ -104,7 +104,12 @@ AND p."Discriminator" = 'CasualPlantilla'
 SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
 FROM references_tblfinfund AS node,
         references_tblfinfund AS parent
-WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.name LIKE $P{searchtext}
+WHERE node.lft BETWEEN parent.lft AND parent.rgt 
+AND node.lft NOT BETWEEN 
+(SELECT lft FROM references_tblfinfund WHERE objid = 'bbf36e75-cf93-480e-bbf4-d99d5b2dcac5') AND 
+(SELECT rgt FROM references_tblfinfund WHERE objid = 'bbf36e75-cf93-480e-bbf4-d99d5b2dcac5') 
+AND node.name <> 'ROOT'
+AND node.name LIKE $P{searchtext}
 GROUP BY node.name
 ORDER BY node.lft
 
@@ -113,12 +118,25 @@ SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`
 FROM references_tblfinaccounttitle AS node,
         references_tblfinaccounttitle AS parent
 WHERE node.lft BETWEEN parent.lft AND parent.rgt AND node.name LIKE $P{searchtext}
+AND node.name <> 'ROOT'
 GROUP BY node.name
 ORDER BY node.lft
 
 [getJobPosition]
 SELECT * FROM references_tbljobposition
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+[getIncrementType]
+SELECT * FROM references_tblemptincrementtype
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+[getPositionServiceClassification]
+SELECT * FROM references_tblemptpositionserviceclassification
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+[getPositionServiceSubClassification]
+SELECT * FROM references_tblemptpositionservicesubclassification
+WHERE positionserviceclassificationid = $P{parentid} AND (name LIKE $P{searchtext} OR code LIKE $P{searchtext})
 
 
 [initroot]
