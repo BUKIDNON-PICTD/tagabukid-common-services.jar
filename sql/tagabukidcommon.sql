@@ -138,6 +138,17 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 SELECT * FROM references_tblemptpositionservicesubclassification
 WHERE positionserviceclassificationid = $P{parentid} AND (name LIKE $P{searchtext} OR code LIKE $P{searchtext})
 
+[getEducationalInstitution]
+SELECT * FROM references_tblinstitution 
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext} OR address_addressdetails LIKE $P{searchtext} 
+
+
+
+
+
+
+
+
 
 [initroot]
 UPDATE ${tablename} SET lft = 1, rgt = 2 WHERE ${parentid} IS NULL

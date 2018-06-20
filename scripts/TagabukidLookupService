@@ -113,5 +113,10 @@ public class TagabukidLookupService
 		return util.lookuphrmis( 'tagabukidcommon:getPositionServiceSubClassification', params,'objid' )
 	}
 
+	@ProxyMethod
+	public def lookupEducationalInstitution( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getEducationalInstitution', params,'objid' )
+	}
+
 }
 
