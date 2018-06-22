@@ -48,7 +48,7 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 SELECT * FROM hrmis_tblpayrollsalarytranche
 WHERE isapproved = 1 AND name LIKE $P{searchtext}
 
-[getVacantPlantilla]
+[getVacantPlantilla1]
 SELECT p."Id",p."ItemNo",
   o."OrgUnitId" AS org_objid,o."Entity_Name" AS org_name,o."Entity_AcronymAbbreviation" AS org_code,o."Entity_Description" AS org_description,
   j."Id" AS jobposition_objid,j."Entity_Name" AS jobposition_name,j."Entity_AcronymAbbreviation" AS jobposition_code,j."Entity_Description" AS jobposition_description,
@@ -74,7 +74,60 @@ AND o."OrgUnitId" = UUID($P{orgunitid})
 AND p."Discriminator" = 'CasualPlantilla'
 AND mm."Id" IS NULL
 
-[getPlantillaById]
+[getVacantPlantilla]
+SELECT	p.objid,
+  p.itemno,
+  o.orgunitid AS org_objid,
+  o.name AS org_name,
+  o.code AS org_code,
+  o.description AS org_description,
+  j.objid AS jobposition_objid,
+  j.name AS jobposition_name,
+  j.code AS jobposition_code,
+  j.description AS jobposition_description,
+  f.objid AS finfund_objid,
+  f.name AS finfund_name,
+  f.code AS finfund_code,
+  f.description AS finfund_description,
+  a.objid AS finaccounttitle_objid,
+  a.name AS finaccounttitle_name,
+  a.code AS finaccounttitle_code,
+  a.description AS finaccounttitle_description,
+  i.objid AS incrementtype_objid,
+  i.name AS incrementtype_name,
+  i.code AS incrementtype_code,
+  i.description AS incrementtype_description,
+  s.objid AS positionclassification_objid,
+  s.name AS positionclassification_name,
+  s.code AS positionclassification_code,
+  s.description AS positionclassification_description,
+  sc.objid AS postiionsubclassification_objid,
+  sc.name AS postiionsubclassification_name,
+  sc.code AS postiionsubclassification_code,
+  sc.description AS postiionsubclassification_description,
+  p.type, 
+  pay.objid AS paygradeandstepincrement_objid, 
+  pay.`grade` AS paygradeandstepincrement_grade, 
+  pay.step AS paygradeandstepincrement_step
+FROM hrmis_tblemploymentplantilla p
+INNER JOIN references_tblorganizationunit o ON o.`orgunitid` = p.`org_orgunitid`
+INNER JOIN references_tbljobposition j ON j.`objid` = p.`jobposition_objid`
+INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygradeid`
+INNER JOIN references_tblfinfund f ON f.`objid` = p.`fund_objid`
+INNER JOIN references_tblfinaccounttitle a ON a.`objid` = p.`accounttitle_objid`
+LEFT JOIN references_tblemptincrementtype i ON i.`objid` = p.`incrementtype_objid`
+LEFT JOIN references_tblemptpositionserviceclassification s ON s.`objid` = p.`positionserviceclassification_objid`
+LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = p.`positionservicesubclassification_objid`
+WHERE p.`isfunded` = TRUE 
+AND p.type = 'casual'
+AND o.orgunitid = $P{orgunitid}
+AND p.`objid` NOT IN (
+SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
+INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
+WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil`)
+
+
+[getPlantillaByIdx]
 SELECT p."Id",p."ItemNo",
   o."OrgUnitId" AS org_objid,o."Entity_Name" AS org_name,o."Entity_AcronymAbbreviation" AS org_code,o."Entity_Description" AS org_description,
   j."Id" AS jobposition_objid,j."Entity_Name" AS jobposition_name,j."Entity_AcronymAbbreviation" AS jobposition_code,j."Entity_Description" AS jobposition_description,
@@ -98,6 +151,54 @@ LEFT JOIN "hrmis"."tblEmploymentBatchPlantillaAppointment" bb ON bb."PlantillaGr
 WHERE p."IsFunded" = true
 AND p."Id" = UUID($P{plantillaid})
 AND p."Discriminator" = 'CasualPlantilla'
+
+[findPlantillaById]
+SELECT	p.objid,
+  p.itemno,
+  o.orgunitid AS org_objid,
+  o.name AS org_name,
+  o.code AS org_code,
+  o.description AS org_description,
+  j.objid AS jobposition_objid,
+  j.name AS jobposition_name,
+  j.code AS jobposition_code,
+  j.description AS jobposition_description,
+  f.objid AS finfund_objid,
+  f.name AS finfund_name,
+  f.code AS finfund_code,
+  f.description AS finfund_description,
+  a.objid AS finaccounttitle_objid,
+  a.name AS finaccounttitle_name,
+  a.code AS finaccounttitle_code,
+  a.description AS finaccounttitle_description,
+  i.objid AS incrementtype_objid,
+  i.name AS incrementtype_name,
+  i.code AS incrementtype_code,
+  i.description AS incrementtype_description,
+  s.objid AS positionclassification_objid,
+  s.name AS positionclassification_name,
+  s.code AS positionclassification_code,
+  s.description AS positionclassification_description,
+  sc.objid AS postiionsubclassification_objid,
+  sc.name AS postiionsubclassification_name,
+  sc.code AS postiionsubclassification_code,
+  sc.description AS postiionsubclassification_description,
+  p.type, 
+  pay.objid AS paygradeandstepincrement_objid, 
+  pay.`grade` AS paygradeandstepincrement_grade, 
+  pay.step AS paygradeandstepincrement_step
+FROM hrmis_tblemploymentplantilla p
+INNER JOIN references_tblorganizationunit o ON o.`orgunitid` = p.`org_orgunitid`
+INNER JOIN references_tbljobposition j ON j.`objid` = p.`jobposition_objid`
+INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygradeid`
+INNER JOIN references_tblfinfund f ON f.`objid` = p.`fund_objid`
+INNER JOIN references_tblfinaccounttitle a ON a.`objid` = p.`accounttitle_objid`
+LEFT JOIN references_tblemptincrementtype i ON i.`objid` = p.`incrementtype_objid`
+LEFT JOIN references_tblemptpositionserviceclassification s ON s.`objid` = p.`positionserviceclassification_objid`
+LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = p.`positionservicesubclassification_objid`
+WHERE p.`isfunded` = TRUE 
+AND p.type = 'casual'
+AND p.objid = $P{plantillaid}
 
 
 [getFund]

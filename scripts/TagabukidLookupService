@@ -62,15 +62,26 @@ public class TagabukidLookupService
 		return util.lookupmainsingle( 'tagabukidcommon:getEntityPersonnel', params,'objid' )	
 	}
 
+	// @ProxyMethod
+	// public def lookupPlantilla( params ) {
+	// 	params.orgunitid = params.org.orgunitid
+	// 	return utilpostgre.lookupPostgreHrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
+	// }
+
 	@ProxyMethod
 	public def lookupPlantilla( params ) {
 		params.orgunitid = params.org.orgunitid
-		return utilpostgre.lookupPostgreHrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
+		return util.lookuphrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
 	}
 
+	// @ProxyMethod
+	// public def getPlantillaById( params ) {
+	// 	return utilpostgre.lookupPostgreHrmisSingle( 'tagabukidcommon:getPlantillaById', params,'objid' )
+	// }
+
 	@ProxyMethod
-	public def getPlantillaById( params ) {
-		return utilpostgre.lookupPostgreHrmisSingle( 'tagabukidcommon:getPlantillaById', params,'objid' )
+	public def findPlantillaById( params ) {
+		return util.lookuphrmissingle( 'tagabukidcommon:findPlantillaById', params,'objid' )
 	}
 
 	@ProxyMethod
