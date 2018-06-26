@@ -247,6 +247,9 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext} OR address_addressdet
 SELECT * FROM references_tbltrainingcategory 
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
+[getRecognitionCategory]
+SELECT * FROM references_tblrecognitioncategory 
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 
 
