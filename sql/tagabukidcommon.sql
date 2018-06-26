@@ -243,7 +243,9 @@ WHERE positionserviceclassificationid = $P{parentid} AND (name LIKE $P{searchtex
 SELECT * FROM references_tblinstitution 
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext} OR address_addressdetails LIKE $P{searchtext} 
 
-
+[getTrainingCategory]
+SELECT * FROM references_tbltrainingcategory 
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 
 
