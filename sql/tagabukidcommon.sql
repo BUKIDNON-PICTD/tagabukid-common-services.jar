@@ -74,7 +74,7 @@ AND o."OrgUnitId" = UUID($P{orgunitid})
 AND p."Discriminator" = 'CasualPlantilla'
 AND mm."Id" IS NULL
 
-[getVacantPlantilla]
+[getVacantCasualPlantilla]
 SELECT	p.objid,
   p.itemno,
   o.orgunitid AS org_objid,
@@ -124,7 +124,7 @@ AND o.orgunitid = $P{orgunitid}
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
-WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil`)
+WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
 
 
 [getPlantillaByIdx]

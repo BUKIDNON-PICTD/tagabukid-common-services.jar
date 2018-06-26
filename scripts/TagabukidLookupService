@@ -45,7 +45,7 @@ public class TagabukidLookupService
 	public def lookupEntityPersonnel( params ) {
 		params.filter = '''
 			INNER JOIN entityindividual ei ON e.objid=ei.objid 
-			INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
+		INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
 			WHERE e.entityname LIKE $P{searchtext}  
 			ORDER BY e.entityname 
 			'''			
@@ -57,7 +57,7 @@ public class TagabukidLookupService
 		params.filter = '''
 			INNER JOIN entityindividual ei ON e.objid=ei.objid 
 			INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
-			WHERE e.objid = $P{entityid}  
+			WHERE e.objid = $P{entityid}
 			'''			
 		return util.lookupmainsingle( 'tagabukidcommon:getEntityPersonnel', params,'objid' )	
 	}
@@ -69,9 +69,10 @@ public class TagabukidLookupService
 	// }
 
 	@ProxyMethod
-	public def lookupPlantilla( params ) {
+	public def lookupVacantCasualPlantilla( params ) {
 		params.orgunitid = params.org.orgunitid
-		return util.lookuphrmis( 'tagabukidcommon:getVacantPlantilla', params,'objid' )
+		params.personnelid = params.personnel.objid
+		return util.lookuphrmis( 'tagabukidcommon:getVacantCasualPlantilla', params,'objid' )
 	}
 
 	// @ProxyMethod
