@@ -279,5 +279,5 @@ UPDATE ${tablename} SET lft = lft + 2 WHERE lft > $P{myLeft}
 UPDATE ${tablename} SET lft = $P{myLeft} + 1, rgt = $P{myLeft} + 2 WHERE ${tblprimarykey} = $P{objid}
 
 [getCivilService]
-SELECT * FROM hrmis_civilserviceeligibility 
+SELECT * FROM references_tbleligibilitytype 
 WHERE name LIKE $P{searchtext}
