@@ -277,3 +277,7 @@ UPDATE ${tablename} SET lft = lft + 2 WHERE lft > $P{myLeft}
 
 [addChild]
 UPDATE ${tablename} SET lft = $P{myLeft} + 1, rgt = $P{myLeft} + 2 WHERE ${tblprimarykey} = $P{objid}
+
+[getCivilService]
+SELECT * FROM hrmis_civilserviceeligibility 
+WHERE name LIKE $P{searchtext}

@@ -140,5 +140,11 @@ public class TagabukidLookupService
 		return util.lookuphrmis( 'tagabukidcommon:getRecognitionCategory', params,'objid' )
 	}
 
+	@ProxyMethod
+	public def lookupCivilService( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getCivilService', params,'objid' )
+	}
+
+
 }
 
