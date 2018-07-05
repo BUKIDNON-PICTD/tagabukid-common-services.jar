@@ -121,10 +121,12 @@ LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = 
 WHERE p.`isfunded` = TRUE 
 AND p.type = 'casual'
 AND o.orgunitid = $P{orgunitid}
+(AND j.name LIKE $P{searchtext} OR o.itemno $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
 WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
+ORDER BY o.itemno
 
 
 [getPlantillaByIdx]
