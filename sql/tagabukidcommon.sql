@@ -214,6 +214,10 @@ AND node.name LIKE $P{searchtext}
 GROUP BY node.name
 ORDER BY node.lft
 
+[getParentFund]
+SELECT * FROM references_tblfinfund
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext} 
+
 [getAccountTitle]
 SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
 FROM references_tblfinaccounttitle AS node,
