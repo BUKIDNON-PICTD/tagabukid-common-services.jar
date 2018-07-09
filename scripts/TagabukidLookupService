@@ -45,7 +45,6 @@ public class TagabukidLookupService
 	public def lookupEntityPersonnel( params ) {
 		params.filter = '''
 			INNER JOIN entityindividual ei ON e.objid=ei.objid 
-		INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
 			WHERE e.entityname LIKE $P{searchtext}  
 			ORDER BY e.entityname 
 			'''			
@@ -144,9 +143,12 @@ public class TagabukidLookupService
 	public def lookupParentFund( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:getParentFund', params,'objid' )
 	}
-
-
 	
+
+	public def lookupCivilService( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getCivilService', params,'objid' )
+	}
+
 
 }
 

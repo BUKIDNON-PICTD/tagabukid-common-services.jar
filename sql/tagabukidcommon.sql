@@ -121,10 +121,12 @@ LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = 
 WHERE p.`isfunded` = TRUE 
 AND p.type = 'casual'
 AND o.orgunitid = $P{orgunitid}
+(AND j.name LIKE $P{searchtext} OR p.itemno $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
-WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
+WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
+ORDER BY p.itemno
 
 
 [getPlantillaByIdx]
@@ -216,7 +218,7 @@ ORDER BY node.lft
 
 [getParentFund]
 SELECT * FROM references_tblfinfund
-WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext} 
+WHERE objid LIKE 'bbf36e75-cf93-480e-bbf4-d99d5b2dcac5'
 
 [getAccountTitle]
 SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
@@ -281,3 +283,7 @@ UPDATE ${tablename} SET lft = lft + 2 WHERE lft > $P{myLeft}
 
 [addChild]
 UPDATE ${tablename} SET lft = $P{myLeft} + 1, rgt = $P{myLeft} + 2 WHERE ${tblprimarykey} = $P{objid}
+
+[getCivilService]
+SELECT * FROM references_tbleligibilitytype 
+WHERE name LIKE $P{searchtext}
