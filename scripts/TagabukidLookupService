@@ -55,7 +55,6 @@ public class TagabukidLookupService
 	public def getEntityByObjid( params ) {
 		params.filter = '''
 			INNER JOIN entityindividual ei ON e.objid=ei.objid 
-			INNER JOIN tagabukid_hrmis.hrmis_entity xxx ON xxx.objid = e.objid
 			WHERE e.objid = $P{entityid}
 			'''			
 		return util.lookupmainsingle( 'tagabukidcommon:getEntityPersonnel', params,'objid' )	
