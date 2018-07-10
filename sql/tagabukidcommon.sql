@@ -216,6 +216,10 @@ AND node.name LIKE $P{searchtext}
 GROUP BY node.name
 ORDER BY node.lft
 
+[getParentFund]
+SELECT * FROM references_tblfinfund
+WHERE objid LIKE 'bbf36e75-cf93-480e-bbf4-d99d5b2dcac5'
+
 [getAccountTitle]
 SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*
 FROM references_tblfinaccounttitle AS node,
