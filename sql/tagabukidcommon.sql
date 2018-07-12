@@ -125,8 +125,8 @@ AND (j.name LIKE $P{searchtext} OR o.itemno LIKE $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
-WHERE a.state = 'APPROVED' AND NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
-ORDER BY o.itemno
+WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
+ORDER BY p.itemno
 
 
 [getPlantillaByIdx]
@@ -215,6 +215,10 @@ AND node.name <> 'ROOT'
 AND node.name LIKE $P{searchtext}
 GROUP BY node.name
 ORDER BY node.lft
+
+[getParentFund]
+SELECT * FROM references_tblfinfund
+WHERE objid LIKE '79d3b1e6-1bfd-4345-ac35-5c25b80f4c18'
 
 [getAccountTitle]
 SELECT CONCAT( REPEAT( '-', (COUNT(parent.name) - 1) ), node.name) AS `location`,node.*

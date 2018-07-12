@@ -139,6 +139,11 @@ public class TagabukidLookupService
 	}
 
 	@ProxyMethod
+	public def lookupParentFund( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getParentFund', params,'objid' )
+	}
+	
+
 	public def lookupCivilService( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:getCivilService', params,'objid' )
 	}
