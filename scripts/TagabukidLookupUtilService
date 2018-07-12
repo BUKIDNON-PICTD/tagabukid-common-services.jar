@@ -116,6 +116,7 @@ class TagabukidLookupUtilService
 		//def root = emcommon.findroot([tablename:o.tablename]);
 		emcommon.setlftrgttonull([tablename:o.tablename]);
 		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
+		
 		def nodes;
 		while(nodes = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])){
 			
