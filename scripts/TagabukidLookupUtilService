@@ -110,18 +110,42 @@ class TagabukidLookupUtilService
 		return qry.setParameters(params).singleResult 
 	}
 
+	@ProxyMethod
+	public def subayhierarchyutil(o) {
+		def profiles = emhrmis.sqlContext.createQuery('''
+			SELECT objid FROM xxxmigratedprofile
+		''').resultList;
+
+		return "DONE"
+	}
+	
 
 	@ProxyMethod
 	public def hierarchyutil(o) {
 		//def root = emcommon.findroot([tablename:o.tablename]);
 		emcommon.setlftrgttonull([tablename:o.tablename]);
 		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
-		def nodes;
+		// def x = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])
+		// x.each{
+		// 	if (o.parentid.split("_").size() > 0){
+		// 		println it[o.parentid.split("_")[0]][o.parentid.split("_")[1]]
+		// 	}else{
+		// 		println it[o.parentid]
+		// 	}
+		// }
+		def nodes
 		while(nodes = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])){
 			
 			nodes.each{
-				def parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid]]);
+				def parent
+				if (o.parentid.split("_").size() > 0){
+					parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid.split("_")[0]][o.parentid.split("_")[1]]])
+				}else{
+					parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid]])
+				}
+					
 				if(parent){
+					// println parent
 					//emcommon.locktable([tablename:o.tablename])
 					emcommon.changeParentRight([tablename:o.tablename,myLeft:parent.lft]);
 					emcommon.changeParentLeft([tablename:o.tablename,myLeft:parent.lft]);
