@@ -125,6 +125,7 @@ class TagabukidLookupUtilService
 		//def root = emcommon.findroot([tablename:o.tablename]);
 		emcommon.setlftrgttonull([tablename:o.tablename]);
 		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
+
 		// def x = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])
 		// x.each{
 		// 	if (o.parentid.split("_").size() > 0){
@@ -133,7 +134,8 @@ class TagabukidLookupUtilService
 		// 		println it[o.parentid]
 		// 	}
 		// }
-		def nodes
+		def nodes;
+
 		while(nodes = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])){
 			
 			nodes.each{
