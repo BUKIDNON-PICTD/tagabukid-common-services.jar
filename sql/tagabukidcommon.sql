@@ -112,7 +112,7 @@ SELECT	p.objid,
 FROM hrmis_tblemploymentplantilla p
 INNER JOIN references_tblorganizationunit o ON o.`orgunitid` = p.`org_orgunitid`
 INNER JOIN references_tbljobposition j ON j.`objid` = p.`jobposition_objid`
-INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygradeid`
+INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygrade_objid`
 INNER JOIN references_tblfinfund f ON f.`objid` = p.`fund_objid`
 INNER JOIN references_tblfinaccounttitle a ON a.`objid` = p.`accounttitle_objid`
 LEFT JOIN references_tblemptincrementtype i ON i.`objid` = p.`incrementtype_objid`
@@ -121,7 +121,7 @@ LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = 
 WHERE p.`isfunded` = TRUE 
 AND p.type = 'casual'
 AND o.orgunitid = $P{orgunitid}
-AND (j.name LIKE $P{searchtext} OR o.itemno LIKE $P{searchtext})
+AND (j.name LIKE $P{searchtext} OR p.itemno LIKE $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
@@ -192,7 +192,7 @@ SELECT	p.objid,
 FROM hrmis_tblemploymentplantilla p
 INNER JOIN references_tblorganizationunit o ON o.`orgunitid` = p.`org_orgunitid`
 INNER JOIN references_tbljobposition j ON j.`objid` = p.`jobposition_objid`
-INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygradeid`
+INNER JOIN references_tblpaygradeandstepincrement pay ON pay.`objid` = j.`paygrade_objid`
 INNER JOIN references_tblfinfund f ON f.`objid` = p.`fund_objid`
 INNER JOIN references_tblfinaccounttitle a ON a.`objid` = p.`accounttitle_objid`
 LEFT JOIN references_tblemptincrementtype i ON i.`objid` = p.`incrementtype_objid`

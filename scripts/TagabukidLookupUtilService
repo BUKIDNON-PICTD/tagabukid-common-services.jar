@@ -20,6 +20,12 @@ class TagabukidLookupUtilService
 	@ActiveDB(value='tagabukidcommon', em='tagabukid_hrmis')
 	def emcommon;
 
+	@Service("PersistenceService")
+    def persistenceSvc;
+
+	@DataContext(dynamic=true)
+	def db;
+
 	@ProxyMethod
 	public def lookuphrmis( namedsql, params, pagingKeys) {
 		if (! params) params = [:]
@@ -139,13 +145,14 @@ class TagabukidLookupUtilService
 		while(nodes = emcommon.getnodes([tablename:o.tablename,parentid:o.parentid])){
 			
 			nodes.each{
+			
 				def parent
-				if (o.parentid.split("_").size() > 0){
+				if (o.parentid.split("_").size() > 1){
 					parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid.split("_")[0]][o.parentid.split("_")[1]]])
 				}else{
 					parent = emcommon.findparent([tablename:o.tablename,tblprimarykey:o.primarykey,parentid:it[o.parentid]])
 				}
-					
+
 				if(parent){
 					// println parent
 					//emcommon.locktable([tablename:o.tablename])
@@ -190,5 +197,170 @@ class TagabukidLookupUtilService
 		emcommon.initroot([tablename:o.tablename,parentid:o.parentid]);
 	}
 
+	@ProxyMethod
+	public void autoCode(p) {
+		// def p =[:]
+		// p._schemaname = "pmissuccessindicators"
+		// p.lft = 77
+		def emx = db.lookup(p._schemaname);
+		def parent = emx.where('parentid = :parentid AND :lft BETWEEN lft AND rgt', [parentid:"ROOT",lft:p.lft]).first()
+		parent._schemaname = p._schemaname
+		autoCodeChildNode(emx,parent)
+	}
+
+	void autoCodeChildNode(emx,parent){
+
+		def childnodes = emx.where('parentid = :parentid', [parentid:parent.objid]).list()
+		def x = 1;
+		childnodes.each{
+	
+			//update code
+			it.code = parent.code + "-" + x
+			println it.code
+			it._schemaname = parent._schemaname
+			persistenceSvc.save(it) 
+
+			//check if naa anak ang gi add nga child
+			def haschild = emx.where('parentid = :parentid', [parentid:it.objid]).first()
+			if(haschild) {
+				autoCodeChildNode(emx,it)
+			}
+			x+=1;
+			
+		}
+	
+	}
+
+	@ProxyMethod
+	public void copyNode(p) {
+		def emx = db.lookup(p._schemaname);
+		copyChildNode(emx,p.oldnodeid,p.newnodeid,p._schemaname)
+	}
+
+	void copyChildNode(emx,oldnodeid,newnodeid,_schemaname){
+		//pangitaa ang mga anak
+		def childnodes = emx.where('parentid = :parentid', [parentid:oldnodeid]).list()
+		childnodes.each{
+			
+			//add sa ang child
+			def newchild = [:]
+			newchild = it
+			newchild.prevobjid = it.objid
+			newchild.objid = 'SI' + new java.rmi.server.UID(); 
+			newchild.parentid = newnodeid
+			newchild._schemaname = _schemaname
+			newchild = addChild(newchild)
+			persistenceSvc.save(newchild) 
+
+			//check if naa anak ang gi add nga child
+			def haschild = emx.where('parentid = :parentid', [parentid:newchild.prevobjid]).first()
+			if(haschild) {
+				copyChildNode(emx,newchild.prevobjid,newchild.objid,_schemaname)
+			}
+			
+		}
+	
+		
+	}
+
+
+	@ProxyMethod
+	public def addSibling(c) {
+	
+		// def myRight = c.rgt;
+
+		// def em = db.lookup(c._schemaname);
+		
+		// //update siblings
+		// def rgtgtmyright = em.where('rgt > :myright', [myright:myRight]).list()
+		// rgtgtmyright.each{
+		// 	it.rgt = it.rgt + 2
+		// 	it._schemaname = c._schemaname
+		// 	persistenceSvc.update(it)
+		// }
+
+		// def lftgtmyright = em.where('lft > :myright', [myright:myRight]).list()
+		// lftgtmyright.each{
+		// 	it.lft = it.lft + 2
+		// 	it._schemaname = c._schemaname
+		// 	persistenceSvc.update(it)
+		// }
+
+		// // insert siblings
+		// c.lft = myRight + 1
+		// c.rgt = myRight + 2
+
+		// return c
+		
+	}
+
+	@ProxyMethod
+	public def addChild(c) {
+		//get parent
+		def p = [_schemaname: c._schemaname];
+        p.findBy = [ objid: c.parentid ];
+		def parent = querySvc.findFirst(p);
+
+		def myLeft = parent.lft
+
+		//println parent
+		if(parent){
+			//emcommon.locktable([tablename:o.tablename])
+		
+			def emx = db.lookup(c._schemaname);
+			
+			def right = emx.where('rgt > :myleft', [myleft:myLeft]).list()
+			right.each{
+				it.rgt = it.rgt + 2
+				it._schemaname = c._schemaname
+				persistenceSvc.update(it)
+			}
+
+			def left = emx.where('lft > :myleft', [myleft:myLeft]).list()
+			left.each{
+				it.lft = it.lft + 2
+				it._schemaname = c._schemaname
+				persistenceSvc.update(it)
+			}
+			c.lft = myLeft + 1
+			c.rgt = myLeft + 2
+			return c
+			//emcommon.unlocktable()
+		}
+		return null
+	}
+
+	@ProxyMethod
+	public void deleteNode(c) {
+
+		def myLeft = c.lft
+		def myRight = c.rgt
+		def myWidth = c.rgt - c.lft + 1
+		
+		def emx = db.lookup(c._schemaname);
+		//delete all child
+		emx.where('lft BETWEEN :myleft AND :myright', [myleft:myLeft,myright:myRight]).delete()
+
+		def right = emx.where('rgt > :myright', [myright:myRight]).list()
+		right.each{
+			it.rgt = it.rgt - myWidth
+			it._schemaname = c._schemaname
+			persistenceSvc.update(it)
+		}
+
+		def left = emx.where('lft > :myright', [myright:myRight]).list()
+		left.each{
+			it.lft = it.lft - myWidth
+			it._schemaname = c._schemaname
+			persistenceSvc.update(it)
+		}
+
+		
+	}
+
+	@ProxyMethod
+    public def changeParent(o) {
+    
+    }
 
 }
