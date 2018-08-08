@@ -157,5 +157,15 @@ public class TagabukidLookupService
 	}
 
 
+	@ProxyMethod
+	public def getSingleServiceRecordById( params ) {
+		// params.filter = '''
+		// 	INNER JOIN entityindividual ei ON e.objid=ei.objid 
+		// 	WHERE e.objid = $P{entityid}
+		// 	'''			
+		return util.lookuphrmissingle( 'tagabukidcommon:getServiceRecordAction', params,'objid' )	
+	}
+
+
 }
 
