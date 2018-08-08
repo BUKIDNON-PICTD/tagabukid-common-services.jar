@@ -2,6 +2,7 @@
 SELECT * FROM references_tblorganizationunit
 WHERE (UPPER(name) LIKE $P{searchtext} 
 OR UPPER(code) LIKE $P{searchtext})
+${filter}
 ORDER BY name
 
 [getOrgUnitByParent]

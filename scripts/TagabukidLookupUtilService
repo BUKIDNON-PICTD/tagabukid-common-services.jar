@@ -199,24 +199,21 @@ class TagabukidLookupUtilService
 
 	@ProxyMethod
 	public void autoCode(p) {
-		// def p =[:]
-		// p._schemaname = "pmissuccessindicators"
-		// p.lft = 77
 		def emx = db.lookup(p._schemaname);
 		def parent = emx.where('parentid = :parentid AND :lft BETWEEN lft AND rgt', [parentid:"ROOT",lft:p.lft]).first()
 		parent._schemaname = p._schemaname
 		autoCodeChildNode(emx,parent)
+	
 	}
 
 	void autoCodeChildNode(emx,parent){
 
-		def childnodes = emx.where('parentid = :parentid', [parentid:parent.objid]).list()
+		def childnodes = emx.where('parentid = :parentid', [parentid:parent.objid]).orderBy('lft').list()
 		def x = 1;
 		childnodes.each{
 	
 			//update code
 			it.code = parent.code + "-" + x
-			println it.code
 			it._schemaname = parent._schemaname
 			persistenceSvc.save(it) 
 
@@ -239,7 +236,7 @@ class TagabukidLookupUtilService
 
 	void copyChildNode(emx,oldnodeid,newnodeid,_schemaname){
 		//pangitaa ang mga anak
-		def childnodes = emx.where('parentid = :parentid', [parentid:oldnodeid]).list()
+		def childnodes = emx.where('parentid = :parentid', [parentid:oldnodeid]).orderBy('lft').list()
 		childnodes.each{
 			
 			//add sa ang child
@@ -250,7 +247,7 @@ class TagabukidLookupUtilService
 			newchild.parentid = newnodeid
 			newchild._schemaname = _schemaname
 			newchild = addChild(newchild)
-			persistenceSvc.save(newchild) 
+			persistenceSvc.create(newchild) 
 
 			//check if naa anak ang gi add nga child
 			def haschild = emx.where('parentid = :parentid', [parentid:newchild.prevobjid]).first()
@@ -264,35 +261,35 @@ class TagabukidLookupUtilService
 	}
 
 
-	@ProxyMethod
-	public def addSibling(c) {
+	// @ProxyMethod
+	// public def addSibling(c) {
 	
-		// def myRight = c.rgt;
+	// 	// def myRight = c.rgt;
 
-		// def em = db.lookup(c._schemaname);
+	// 	// def em = db.lookup(c._schemaname);
 		
-		// //update siblings
-		// def rgtgtmyright = em.where('rgt > :myright', [myright:myRight]).list()
-		// rgtgtmyright.each{
-		// 	it.rgt = it.rgt + 2
-		// 	it._schemaname = c._schemaname
-		// 	persistenceSvc.update(it)
-		// }
+	// 	// //update siblings
+	// 	// def rgtgtmyright = em.where('rgt > :myright', [myright:myRight]).list()
+	// 	// rgtgtmyright.each{
+	// 	// 	it.rgt = it.rgt + 2
+	// 	// 	it._schemaname = c._schemaname
+	// 	// 	persistenceSvc.update(it)
+	// 	// }
 
-		// def lftgtmyright = em.where('lft > :myright', [myright:myRight]).list()
-		// lftgtmyright.each{
-		// 	it.lft = it.lft + 2
-		// 	it._schemaname = c._schemaname
-		// 	persistenceSvc.update(it)
-		// }
+	// 	// def lftgtmyright = em.where('lft > :myright', [myright:myRight]).list()
+	// 	// lftgtmyright.each{
+	// 	// 	it.lft = it.lft + 2
+	// 	// 	it._schemaname = c._schemaname
+	// 	// 	persistenceSvc.update(it)
+	// 	// }
 
-		// // insert siblings
-		// c.lft = myRight + 1
-		// c.rgt = myRight + 2
+	// 	// // insert siblings
+	// 	// c.lft = myRight + 1
+	// 	// c.rgt = myRight + 2
 
-		// return c
+	// 	// return c
 		
-	}
+	// }
 
 	@ProxyMethod
 	public def addChild(c) {
@@ -358,9 +355,54 @@ class TagabukidLookupUtilService
 		
 	}
 
+	@Async
 	@ProxyMethod
-    public def changeParent(o) {
-    
+    public def changeParent(entitytotransferid,newparent,schemaname) {
+		def o = persistenceSvc.read([_schemaname:schemaname,objid:entitytotransferid])
+		def emx = db.lookup(schemaname);
+		def myLeft = o.lft
+		def myRight = o.rgt
+		def myWidth = o.rgt - o.lft + 1
+
+		o._schemaname = schemaname
+		o.parentid = newparent.objid
+		addChild(o)
+		persistenceSvc.update(o)
+		transferChildNode(emx,o,schemaname)
+		
+
+		def right = emx.where('rgt > :myright', [myright:myRight]).list()
+		right.each{
+			it.rgt = it.rgt - myWidth
+			it._schemaname = schemaname
+			persistenceSvc.update(it)
+		}
+
+		def left = emx.where('lft > :myright', [myright:myRight]).list()
+		left.each{
+			it.lft = it.lft - myWidth
+			it._schemaname = schemaname
+			persistenceSvc.update(it)
+		}
     }
+
+	void transferChildNode(emx,o,schemaname){
+		//pangitaa ang mga anak
+		def nodestotransfer = emx.where('parentid = :parentid', [parentid:o.objid]).orderBy('lft').list()
+		nodestotransfer.each{
+			it._schemaname = schemaname
+			it = addChild(it) 
+			persistenceSvc.update(it)
+
+
+			def haschild = emx.where('parentid = :parentid', [parentid:it.objid]).first()
+			if(haschild) {
+				transferChildNode(emx,it,schemaname)
+			}
+			
+		}
+	
+		
+	}
 
 }
