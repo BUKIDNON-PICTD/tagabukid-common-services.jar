@@ -45,6 +45,24 @@ class TagabukidLookupUtilService
 	}
 
 	@ProxyMethod
+	public def lookuphrmissingle( namedsql, params, pagingKeys) {
+		if (! params) params = [:]
+		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'
+		
+		def qry = emhrmis.sqlContext.createNamedQuery(namedsql)
+		
+		if (pagingKeys){
+			qry.setPagingKeys(pagingKeys)
+		}
+		if (params._start != null){
+			qry.setFirstResult( params._start )
+			qry.setMaxResults(params._limit)
+		}
+		def filter = [filter:params?.filter];
+		return qry.setParameters(params).setVars(filter).singleResult 
+	}
+
+	@ProxyMethod
 	public def lookupmain( namedsql, params, pagingKeys) {
 		if (! params) params = [:]
 		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'

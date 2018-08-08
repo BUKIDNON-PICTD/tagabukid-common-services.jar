@@ -148,6 +148,24 @@ public class TagabukidLookupService
 		return util.lookuphrmis( 'tagabukidcommon:getCivilService', params,'objid' )
 	}
 
+	public def lookupServiceRecordAction( params ) {
+		//println params
+		//return em.getServiceRecordAction( params )
+		//println params
+		return util.lookuphrmis( 'tagabukidcommon:getServiceRecordAction', params,'objid' )
+		println params
+	}
+
+
+	@ProxyMethod
+	public def getSingleServiceRecordById( params ) {
+		// params.filter = '''
+		// 	INNER JOIN entityindividual ei ON e.objid=ei.objid 
+		// 	WHERE e.objid = $P{entityid}
+		// 	'''			
+		return util.lookuphrmissingle( 'tagabukidcommon:getServiceRecordAction', params,'objid' )	
+	}
+
 
 }
 

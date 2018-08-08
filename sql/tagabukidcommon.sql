@@ -288,3 +288,27 @@ UPDATE ${tablename} SET lft = $P{myLeft} + 1, rgt = $P{myLeft} + 2 WHERE ${tblpr
 [getCivilService]
 SELECT * FROM references_tbleligibilitytype 
 WHERE name LIKE $P{searchtext}
+
+[getServiceRecordAction]
+SELECT objid, name, code FROM `references_tblappointmententrycode`
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+UNION
+
+SELECT objid, name, code FROM `references_tblemploymentseparationtype`
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+UNION
+
+SELECT objid, circular_name AS name, circular_acronymabbreviation AS code FROM `hrmis_tblpayrollsalarytranche`
+WHERE name LIKE $P{searchtext} OR circular_acronymabbreviation LIKE $P{searchtext}
+
+UNION
+
+SELECT objid, name, code FROM `references_tblemploymentstepincrementlongivitycircular`
+WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
+
+UNION
+
+SELECT objid, name, objid AS code FROM `references_leave_type`
+WHERE name LIKE $P{searchtext} OR objid LIKE $P{searchtext}
