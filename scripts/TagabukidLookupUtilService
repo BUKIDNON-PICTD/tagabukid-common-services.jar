@@ -39,7 +39,7 @@ class TagabukidLookupUtilService
 	}
 
 	@ProxyMethod
-	public def lookuphrmissingle( namedsql, params, pagingKeys) {
+	public def lookuphrmissingle2( namedsql, params, pagingKeys) {
 		if (! params) params = [:]
 		params.searchtext = (params.searchtext && params.searchtext.trim().length() > 0 ? params.searchtext : '') + '%'
 		
