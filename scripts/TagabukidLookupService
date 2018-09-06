@@ -163,7 +163,8 @@ public class TagabukidLookupService
 		// 	INNER JOIN entityindividual ei ON e.objid=ei.objid 
 		// 	WHERE e.objid = $P{entityid}
 		// 	'''			
-		return util.lookuphrmissingle2( 'tagabukidcommon:getServiceRecordAction', params,'objid' )	
+		return util.lookuphrmissingle2( 'tagabukidcommon:getServiceRecordActionById', params,'objid' )
+			
 	}
 
 

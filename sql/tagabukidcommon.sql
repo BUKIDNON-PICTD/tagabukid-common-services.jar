@@ -311,3 +311,28 @@ UNION
 
 SELECT objid, name, objid AS code FROM `references_leave_type`
 WHERE name LIKE $P{searchtext} OR objid LIKE $P{searchtext}
+
+[getServiceRecordActionById]
+SELECT objid, name, code FROM `references_tblappointmententrycode`
+WHERE objid LIKE $P{objid}
+
+UNION
+
+SELECT objid, name, code FROM `references_tblemploymentseparationtype`
+WHERE objid LIKE $P{objid}
+
+UNION
+
+SELECT objid, circular_name AS name, circular_acronymabbreviation AS code FROM `hrmis_tblpayrollsalarytranche`
+WHERE objid LIKE $P{objid}
+
+UNION
+
+SELECT objid, name, code FROM `references_tblemploymentstepincrementlongivitycircular`
+WHERE objid LIKE $P{objid}
+
+UNION
+
+SELECT objid, name, objid AS code FROM `references_leave_type`
+WHERE objid LIKE $P{objid}
+
