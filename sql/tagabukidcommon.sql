@@ -126,7 +126,9 @@ AND (j.name LIKE $P{searchtext} OR p.itemno LIKE $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
-WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil` AND i.personnel_objid <> $P{personnelid})
+WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil`
+AND i.personnel_objid <> $P{personnelid}
+AND i.`cutoffdate` IS NULL)
 ORDER BY p.itemno
 
 
@@ -290,7 +292,8 @@ SELECT * FROM references_tbleligibilitytype
 WHERE name LIKE $P{searchtext}
 
 [getServiceRecordAction]
-SELECT objid, name, code FROM `references_tblappointmententrycode`
+SELECT xx.objid, xx.name, xx.code FROM 
+(SELECT objid, name, code FROM `references_tblappointmententrycode`
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
 UNION
@@ -311,7 +314,8 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 UNION
 
 SELECT objid, name, objid AS code FROM `references_leave_type`
-WHERE name LIKE $P{searchtext} OR objid LIKE $P{searchtext}
+WHERE name LIKE $P{searchtext} OR objid LIKE $P{searchtext}) xx
+ORDER BY xx.name 
 
 [getServiceRecordActionById]
 SELECT objid, name, code FROM `references_tblappointmententrycode`
