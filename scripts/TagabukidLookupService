@@ -69,7 +69,7 @@ public class TagabukidLookupService
 	@ProxyMethod
 	public def lookupVacantCasualPlantilla( params ) {
 		params.orgunitid = params.org.orgunitid
-		params.personnelid = params.personnel.objid
+		params.pdsid = params.pds.objid
 		return util.lookuphrmis( 'tagabukidcommon:getVacantCasualPlantilla', params,'objid' )
 	}
 

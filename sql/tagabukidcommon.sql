@@ -127,7 +127,7 @@ AND p.`objid` NOT IN (
 SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
 INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
 WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil`
-AND i.personnel_objid <> $P{personnelid}
+AND i.pds_objid <> $P{pdsid}
 AND i.`cutoffdate` IS NULL)
 ORDER BY p.itemno
 
