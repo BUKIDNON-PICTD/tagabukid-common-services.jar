@@ -260,10 +260,70 @@ WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 SELECT * FROM references_tblrecognitioncategory 
 WHERE name LIKE $P{searchtext} OR code LIKE $P{searchtext}
 
+[getPersonnelJO]
+SELECT xx.objid, xx.pdsid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei. middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentjoborderitems` xx
+INNER JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.entityid
+INNER JOIN `tagabukid_hrmis`.`references_tbljobposition` jp ON jp.objid = xx.positionid
+INNER JOIN `tagabukid_hrmis`.`hrmis_appointmentjoborder` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.firstname LIKE $P{searchtext}
 
+UNION
 
+SELECT xx.objid, xx.pdsid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei. middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentjoborderitems` xx
+INNER JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.entityid
+INNER JOIN `tagabukid_hrmis`.`references_tbljobposition` jp ON jp.objid = xx.positionid
+INNER JOIN `tagabukid_hrmis`.`hrmis_appointmentjoborder` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.middlename LIKE $P{searchtext}
 
+UNION
 
+SELECT xx.objid, xx.pdsid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei. middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentjoborderitems` xx
+INNER JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.entityid
+INNER JOIN `tagabukid_hrmis`.`references_tbljobposition` jp ON jp.objid = xx.positionid
+INNER JOIN `tagabukid_hrmis`.`hrmis_appointmentjoborder` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.lastname LIKE $P{searchtext}
+
+ORDER BY name
+
+[getPersonnelCasual]
+SELECT xx.objid, xx.pds_objid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei.middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentcasualitems` xx
+LEFT JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.personnel_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_tblemploymentplantilla` pl ON pl.objid = xx.plantilla_objid
+LEFT JOIN `references_tbljobposition` jp ON jp.objid = pl.jobposition_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_appointmentcasual` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.firstname LIKE $P{searchtext}
+
+UNION
+
+SELECT xx.objid, xx.pds_objid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei.middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentcasualitems` xx
+LEFT JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.personnel_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_tblemploymentplantilla` pl ON pl.objid = xx.plantilla_objid
+LEFT JOIN `references_tbljobposition` jp ON jp.objid = pl.jobposition_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_appointmentcasual` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.middlename LIKE $P{searchtext}
+
+UNION
+
+SELECT xx.objid, xx.pds_objid, CONCAT( ei.lastname, ", ", ei.firstname, " ", ei.middlename ) AS name, jp.name AS position, par.effectiveuntil, par.appointmentgroupname
+FROM `tagabukid_hrmis`.`hrmis_appointmentcasualitems` xx
+LEFT JOIN etracs254_bukidnon.entityindividual ei ON ei.objid = xx.personnel_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_tblemploymentplantilla` pl ON pl.objid = xx.plantilla_objid
+LEFT JOIN `references_tbljobposition` jp ON jp.objid = pl.jobposition_objid
+LEFT JOIN `tagabukid_hrmis`.`hrmis_appointmentcasual` par ON par.objid = xx.parentid
+WHERE par.effectiveuntil > CURDATE() AND ei.lastname LIKE $P{searchtext}
+
+ORDER BY name
+
+[getSignatory]
+SELECT DISTINCT signatoryname, signatorytitle
+FROM `hrmis_appointment_signatorygroupingitems`
+WHERE signatoryname IS NOT NULL AND signatorytitle IS NOT NULL AND signatoryname LIKE $P{searchtext}
+ORDER BY signatoryname
 
 [initroot]
 UPDATE ${tablename} SET lft = 1, rgt = 2 WHERE ${parentid} IS NULL

@@ -147,6 +147,19 @@ public class TagabukidLookupService
 	public def lookupCivilService( params ) {
 		return util.lookuphrmis( 'tagabukidcommon:getCivilService', params,'objid' )
 	}
+	
+
+	public def lookupPersonnelJO( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getPersonnelJO', params,'objid' )
+	}
+
+	public def lookupPersonnelCasual( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getPersonnelCasual', params,'objid' )
+	}
+
+	public def lookupSignatory( params ) {
+		return util.lookuphrmis( 'tagabukidcommon:getSignatory', params,'objid' )
+	}
 
 	public def lookupServiceRecordAction( params ) {
 		//println params
