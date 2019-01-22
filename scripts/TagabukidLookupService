@@ -73,6 +73,13 @@ public class TagabukidLookupService
 		return util.lookuphrmis( 'tagabukidcommon:getVacantCasualPlantilla', params,'objid' )
 	}
 
+	@ProxyMethod
+	public def lookupVacantPermanentPlantilla( params ) {
+		params.orgunitid = params.org.orgunitid
+		params.pdsid = params.pds.objid
+		return util.lookuphrmis( 'tagabukidcommon:getVacantPermanentPlantilla', params,'objid' )
+	}
+
 	// @ProxyMethod
 	// public def getPlantillaById( params ) {
 	// 	return utilpostgre.lookupPostgreHrmisSingle( 'tagabukidcommon:getPlantillaById', params,'objid' )
