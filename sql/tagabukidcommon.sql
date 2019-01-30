@@ -176,15 +176,14 @@ LEFT JOIN references_tblemptincrementtype i ON i.`objid` = p.`incrementtype_obji
 LEFT JOIN references_tblemptpositionserviceclassification s ON s.`objid` = p.`positionserviceclassification_objid`
 LEFT JOIN references_tblemptpositionservicesubclassification sc ON sc.`objid` = p.`positionservicesubclassification_objid`
 WHERE p.`isfunded` = TRUE 
-AND p.type = 'casual'
+AND p.type = 'permanent'
 AND o.orgunitid = $P{orgunitid}
 AND (j.name LIKE $P{searchtext} OR p.itemno LIKE $P{searchtext})
 AND p.`objid` NOT IN (
-SELECT i.`plantilla_objid` FROM hrmis_appointmentcasualitems i
-INNER JOIN hrmis_appointmentcasual a ON a.`objid` = i.`parentid`
-WHERE NOW() BETWEEN a.`effectivefrom` AND a.`effectiveuntil`
-AND i.pds_objid <> $P{pdsid}
-AND i.`cutoffdate` IS NULL)
+SELECT ap.`plantilla_objid` FROM hrmis_appointmentpermanent ap
+WHERE ap.state = "APPROVED"
+AND ap.pds_objid <> $P{pdsid}
+AND ap.`cutoffdate` IS NULL)
 ORDER BY p.itemno
 
 
