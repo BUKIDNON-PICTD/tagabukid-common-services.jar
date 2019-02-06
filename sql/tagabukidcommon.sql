@@ -182,8 +182,7 @@ AND (j.name LIKE $P{searchtext} OR p.itemno LIKE $P{searchtext})
 AND p.`objid` NOT IN (
 SELECT ap.`plantilla_objid` FROM hrmis_appointmentpermanent ap
 WHERE ap.state = "APPROVED"
-AND ap.pds_objid <> $P{pdsid}
-AND ap.`cutoffdate` IS NULL)
+AND ap.pds_objid <> $P{pdsid})
 ORDER BY p.itemno
 
 
